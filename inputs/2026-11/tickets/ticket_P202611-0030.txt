@@ -1,0 +1,7 @@
+TICKET
+acct # 1150
+dt 11-30-26
+Site: 77 granary rd
+Unit: 4yd bin
+dumped ok
+Drv RS

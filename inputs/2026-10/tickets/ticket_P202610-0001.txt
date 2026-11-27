@@ -1,0 +1,7 @@
+Ridgeline ticket
+acct # 1043
+dt 02/10
+Site: 112 Main St
+Unit: 4yd bin
+dumped ok
+Drv DK

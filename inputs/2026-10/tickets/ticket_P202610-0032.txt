@@ -1,0 +1,7 @@
+RIDGELINE WASTE - DRIVER TICKET
+Acct 1150
+dt 23 Oct
+loc: 77 Granary Rd
+Unit: 20yd roll-off
+dumped ok
+Drv DK

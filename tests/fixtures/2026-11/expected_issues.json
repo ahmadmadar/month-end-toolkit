@@ -1,0 +1,94 @@
+[
+  {
+    "flag": "missing_ticket",
+    "pickup_id": "P202611-0004",
+    "account_id": "1043",
+    "date": "2026-11-26"
+  },
+  {
+    "flag": "unbilled_extra",
+    "pickup_id": "P202611-0008",
+    "account_id": "1043",
+    "date": "2026-11-26",
+    "extra_bins": 1
+  },
+  {
+    "flag": "unbilled_extra",
+    "pickup_id": "P202611-0010",
+    "account_id": "1043",
+    "date": "2026-11-10",
+    "extra_bins": 3
+  },
+  {
+    "flag": "unbilled_contamination",
+    "pickup_id": "P202611-0012",
+    "account_id": "1043",
+    "date": "2026-11-24",
+    "note": "paint cans"
+  },
+  {
+    "flag": "unbilled_extra",
+    "pickup_id": "P202611-0020",
+    "account_id": "1102",
+    "date": "2026-11-23",
+    "extra_bins": 1
+  },
+  {
+    "flag": "unbilled_contamination",
+    "pickup_id": "P202611-0023",
+    "account_id": "1102",
+    "date": "2026-11-11",
+    "note": "drywall"
+  },
+  {
+    "flag": "unbilled_contamination",
+    "pickup_id": "P202611-0044",
+    "account_id": "1201",
+    "date": "2026-11-13",
+    "note": "construction debris"
+  },
+  {
+    "flag": "unbilled_extra",
+    "pickup_id": "P202611-0045",
+    "account_id": "1201",
+    "date": "2026-11-20",
+    "extra_bins": 3
+  },
+  {
+    "flag": "needs_human_read",
+    "pickup_id": "P202611-0046",
+    "account_id": "1201",
+    "date": "2026-11-27"
+  },
+  {
+    "flag": "duplicate_ticket",
+    "pickup_id": "P202611-0048",
+    "account_id": "1239",
+    "date": "2026-11-09"
+  },
+  {
+    "flag": "service_dispute",
+    "pickup_id": "P202611-0049",
+    "account_id": "1239",
+    "date": "2026-11-16"
+  },
+  {
+    "flag": "address_mismatch",
+    "pickup_id": "P202611-0053",
+    "account_id": "1264",
+    "date": "2026-11-10",
+    "ticket_address": "1 Copperline Way"
+  },
+  {
+    "flag": "missing_ticket",
+    "pickup_id": "P202611-0059",
+    "account_id": "1264",
+    "date": "2026-11-27"
+  },
+  {
+    "flag": "unmatched_ticket",
+    "pickup_id": null,
+    "account_id": "1102",
+    "date": "2026-11-26"
+  }
+]

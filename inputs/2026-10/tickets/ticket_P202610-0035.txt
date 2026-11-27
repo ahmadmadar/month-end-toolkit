@@ -1,0 +1,7 @@
+TICKET
+acct # 1150
+Date Oct 14
+addr: 15 mill lane
+Unit: 4yd bin
+dumped ok
+Drv TL

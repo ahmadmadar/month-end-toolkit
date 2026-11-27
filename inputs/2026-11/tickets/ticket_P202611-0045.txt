@@ -1,0 +1,8 @@
+TICKET
+A/C 1201
+dt 11-20-26
+loc: 640 Kingsway
+Unit: 4yd bin
+serviced
++3 xtra bins
+Drv TL

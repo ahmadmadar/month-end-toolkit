@@ -1,0 +1,7 @@
+RIDGELINE WASTE - DRIVER TICKET
+acct # 1077
+dt Nov 20
+loc: 301 Elm St
+Unit: 6yd bin
+done
+Drv MJ

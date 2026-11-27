@@ -1,0 +1,7 @@
+Ridgeline ticket
+Acct 1150
+dt 21 Oct
+Site: 15 Mill Lane
+Unit: 4yd bin
+dumped ok
+Drv TL

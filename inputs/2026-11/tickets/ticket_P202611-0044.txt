@@ -1,0 +1,8 @@
+TICKET
+A/C 1201
+dt 13/11
+addr: 640 kingsway
+Unit: 4yd bin
+done
+contaminated: construction debris
+Drv MJ

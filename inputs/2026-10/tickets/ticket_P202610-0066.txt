@@ -1,0 +1,8 @@
+Ridgeline ticket
+acct # 1264
+dt 21 Oct
+Site: 3 birch cres
+Unit: 8yd bin
+dumped ok
+extras: 1 bags/bins
+Drv MJ

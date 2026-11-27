@@ -1,0 +1,7 @@
+Ridgeline ticket
+A/C 1239
+Date 23 Nov
+loc: 88 shore dr
+Unit: 4yd bin
+dumped ok
+Drv TL

@@ -1,0 +1,8 @@
+RIDGELINE WASTE - DRIVER TICKET
+Acct 1077
+dt 13 Oct
+Site: 301 elm street
+Unit: 20yd roll-off
+dumped ok
+contaminated: drywall
+Drv RS

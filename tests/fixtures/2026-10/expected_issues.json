@@ -1,0 +1,94 @@
+[
+  {
+    "flag": "unbilled_contamination",
+    "pickup_id": "P202610-0002",
+    "account_id": "1043",
+    "date": "2026-10-09",
+    "note": "construction debris"
+  },
+  {
+    "flag": "duplicate_ticket",
+    "pickup_id": "P202610-0007",
+    "account_id": "1043",
+    "date": "2026-10-08"
+  },
+  {
+    "flag": "address_mismatch",
+    "pickup_id": "P202610-0008",
+    "account_id": "1043",
+    "date": "2026-10-15",
+    "ticket_address": "92 Pine St"
+  },
+  {
+    "flag": "unbilled_contamination",
+    "pickup_id": "P202610-0010",
+    "account_id": "1043",
+    "date": "2026-10-29",
+    "note": "paint cans"
+  },
+  {
+    "flag": "missing_ticket",
+    "pickup_id": "P202610-0014",
+    "account_id": "1043",
+    "date": "2026-10-23"
+  },
+  {
+    "flag": "unbilled_contamination",
+    "pickup_id": "P202610-0017",
+    "account_id": "1077",
+    "date": "2026-10-13",
+    "note": "drywall"
+  },
+  {
+    "flag": "unbilled_extra",
+    "pickup_id": "P202610-0026",
+    "account_id": "1102",
+    "date": "2026-10-13",
+    "extra_bins": 2
+  },
+  {
+    "flag": "unbilled_extra",
+    "pickup_id": "P202610-0039",
+    "account_id": "1188",
+    "date": "2026-10-13",
+    "extra_bins": 3
+  },
+  {
+    "flag": "missing_ticket",
+    "pickup_id": "P202610-0041",
+    "account_id": "1188",
+    "date": "2026-10-27"
+  },
+  {
+    "flag": "service_dispute",
+    "pickup_id": "P202610-0047",
+    "account_id": "1201",
+    "date": "2026-10-13"
+  },
+  {
+    "flag": "needs_human_read",
+    "pickup_id": "P202610-0048",
+    "account_id": "1201",
+    "date": "2026-10-20"
+  },
+  {
+    "flag": "unbilled_extra",
+    "pickup_id": "P202610-0064",
+    "account_id": "1264",
+    "date": "2026-10-07",
+    "extra_bins": 2
+  },
+  {
+    "flag": "unbilled_extra",
+    "pickup_id": "P202610-0066",
+    "account_id": "1264",
+    "date": "2026-10-21",
+    "extra_bins": 1
+  },
+  {
+    "flag": "unmatched_ticket",
+    "pickup_id": null,
+    "account_id": "1102",
+    "date": "2026-10-26"
+  }
+]

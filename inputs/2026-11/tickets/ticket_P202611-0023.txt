@@ -1,0 +1,8 @@
+TICKET
+Acct 1102
+dt Nov 11
+Site: 1 Copperline Way Loading Dock
+Unit: 6yd bin
+dumped ok
+contam (drywall) photo taken
+Drv DK

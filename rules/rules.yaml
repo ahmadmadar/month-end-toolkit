@@ -1,0 +1,23 @@
+# Client rules. Change these, not the code.
+version: 1
+client: Ridgeline Waste (fictional)
+
+inputs:
+  dispatch_file: dispatch_export.csv
+  tickets_folder: tickets
+
+fees:
+  extra_bin: 40.00          # CAD per extra bin
+  contamination: 175.00     # CAD flat per contaminated pickup
+
+matching:
+  date_tolerance_days: 1    # ticket date may be off by this much
+  address_match: normalized # compare lowercase, no punctuation, St/Street etc.
+
+review:
+  send_low_confidence_to_review: true
+  approval_threshold_cad: 5000   # invoices above this need manager sign-off
+
+model:
+  name: claude-sonnet-5-5
+  max_tokens: 800
