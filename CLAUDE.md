@@ -86,6 +86,42 @@ not a crash.
 After each session: update `docs/delivery-log.md` (what Claude did, what it got wrong,
 what I decided).
 
+## Session workflow
+
+One build step per Claude Code session (see Build order). Each session:
+
+1. **Start:** read this file, `docs/delivery-log.md` and the latest output in
+   `outputs/`. State which session and step we're on before doing anything.
+2. **Design walkthrough before code:** walk me through the plan (files, functions,
+   data shapes, error cases) and wait for my go-ahead. If a step needs a business
+   rule not written here (a fee, a tolerance, what counts as a match), ask me.
+   Don't invent it.
+3. **Build in small pieces.** I review every diff before it's accepted.
+4. **Test before moving on:** run `pytest` and a real run on `2026-10` and
+   `2026-11`. Show me the counts, not just "tests passed".
+5. **End of session:** draft the delivery-log entry (what you did, what you got
+   wrong and how it was caught, what I decided). I confirm the wording.
+
+## Git and commits
+
+- **Git is mine.** Claude never commits, branches, pushes or tags. I do all git
+  work in GitHub Desktop.
+- One branch per session, named `session<n>/<theme>` (e.g. `session1/load-and-run`),
+  created by me. One PR per session into `main`.
+- At the end of each work block, Claude gives me a commit summary and description.
+  Summary format: `<type>: <what changed>`, where type is `feat`, `fix`, `docs`,
+  `chore`, `refactor` or `test`. Description: 2 to 4 bullets of what changed and why.
+- At the end of each session, Claude gives me the PR title and description.
+- Suggested tag (applied by me): `toolkit-v1` on the commit where both sample months
+  run with no code changes. Claude says so next to that commit.
+
+## Conventions
+
+- Python 3.10+. Dependencies in `requirements.txt` (pin versions once the build works).
+- Plain English in anything a client reads (Excel tabs, Skill replies, handover doc).
+- Calculations in code, never in prose. Every number in the output comes from a run.
+- No real organizations or people anywhere in the repo.
+
 ## Tests
 
 - `tests/test_checks.py`: run checks on fixture data and compare flags with
