@@ -5,6 +5,7 @@ client: Ridgeline Waste (fictional)
 inputs:
   dispatch_file: dispatch_export.csv
   tickets_folder: tickets
+  ticket_extensions: [.txt, .pdf, .png, .jpg, .jpeg]   # other files in tickets/ are skipped with a warning
 
 fees:
   extra_bin: 40.00          # CAD per extra bin
