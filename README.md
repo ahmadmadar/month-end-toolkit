@@ -37,16 +37,23 @@ pytest
 | Build step | State |
 |---|---|
 | 1. Load + run command | Done (2026-11-27) |
-| 2. Ticket extraction (Claude) | Next |
-| 3. Matching + checks | Not started |
+| 2. Ticket extraction (Claude) | Done (2026-11-27) |
+| 3. Matching + checks | Next |
 | 4. Full Excel output + month-two test | Not started |
 
 **What works today:** `python run.py --month YYYY-MM` checks the API key, reads
-`rules/rules.yaml`, loads the dispatch export, finds the ticket files and writes
-the Excel file with a **Run log** tab only (counts, file names, warnings). Both
+`rules/rules.yaml`, loads the dispatch export, finds the ticket files, reads each
+ticket with Claude into fixed fields, checks every field, and writes the Excel
+file with a **Run log** tab (counts, file names, warnings, model, tokens). Both
 sample months (`2026-10`, `2026-11`) run with no code changes.
 
-**Not yet:** tickets are found but not read, so no checks, fees or review rows yet.
+Ticket answers are saved in `outputs/YYYY-MM/extracted.json`. A re-run reuses
+them and makes no API calls unless a ticket file or the model settings in
+`rules.yaml` change. Changing `model:` settings re-reads every ticket (about
+$0.25 per sample month).
+
+**Not yet:** no matching, checks, fees or review rows; the Excel file has only
+the Run log tab.
 
 See `CLAUDE.md` for the spec and build order, and `docs/delivery-log.md` for what
 was built and what broke.
