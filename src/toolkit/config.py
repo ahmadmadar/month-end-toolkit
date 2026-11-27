@@ -12,6 +12,8 @@ import yaml
 
 from toolkit.errors import ToolkitError
 
+EFFORT_LEVELS = ("low", "medium", "high", "xhigh", "max")
+
 
 @dataclass(frozen=True)
 class InputsConfig:
@@ -28,8 +30,10 @@ class Rules:
     inputs: InputsConfig
     fees: dict[str, float]
     matching: dict[str, Any]
+    date_tolerance_days: int
     review: dict[str, Any]
     model_name: str
+    model_effort: str
     model_max_tokens: int
 
 
@@ -89,6 +93,13 @@ def load_rules(path: Path) -> Rules:
     max_tokens = model.get("max_tokens")
     if isinstance(max_tokens, bool) or not isinstance(max_tokens, int) or max_tokens <= 0:
         raise ToolkitError(f"{path.name}: 'model.max_tokens' must be a whole number above 0.")
+    matching = _section(data, "matching", path)
+    tolerance = matching.get("date_tolerance_days")
+    if isinstance(tolerance, bool) or not isinstance(tolerance, int) or tolerance < 0:
+        raise ToolkitError(f"{path.name}: 'matching.date_tolerance_days' must be a whole number of 0 or more.")
+    effort = model.get("effort")
+    if effort not in EFFORT_LEVELS:
+        raise ToolkitError(f"{path.name}: 'model.effort' must be one of {', '.join(EFFORT_LEVELS)}.")
 
     return Rules(
         source_path=path,
@@ -100,8 +111,10 @@ def load_rules(path: Path) -> Rules:
             ticket_extensions=_extensions(inputs.get("ticket_extensions"), path),
         ),
         fees=_fees(_section(data, "fees", path), path),
-        matching=dict(_section(data, "matching", path)),
+        matching=dict(matching),
+        date_tolerance_days=tolerance,
         review=dict(_section(data, "review", path)),
         model_name=_text(model, "name", "model", path),
+        model_effort=effort,
         model_max_tokens=max_tokens,
     )

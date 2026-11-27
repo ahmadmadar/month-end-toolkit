@@ -26,6 +26,7 @@ matching:
 review: {}
 model:
   name: some-model
+  effort: low
   max_tokens: 100
 """
 
@@ -65,6 +66,8 @@ def test_missing_rules_file(tmp_path):
         ("extra_bin: 40", "extra_bin: -5", "fee 'extra_bin'"),
         ("max_tokens: 100", "max_tokens: lots", "max_tokens"),
         ("client: Test Client\n", "", "client"),
+        ("effort: low", "effort: extreme", "model.effort"),
+        ("date_tolerance_days: 1", "date_tolerance_days: -1", "date_tolerance_days"),
     ],
 )
 def test_invalid_rules(tmp_path, old, new, message):

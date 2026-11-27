@@ -21,4 +21,5 @@ review:
 
 model:
   name: claude-sonnet-5-5
-  max_tokens: 800
+  effort: low               # low | medium | high | xhigh | max. Thinking is on (adaptive); effort sets how hard it thinks
+  max_tokens: 4000          # thinking + answer must fit; a cut-off answer becomes a low-confidence row
