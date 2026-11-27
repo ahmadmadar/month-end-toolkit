@@ -11,6 +11,7 @@ import json
 import os
 from pathlib import Path
 
+from toolkit.errors import ToolkitError
 from toolkit.loaders import TicketFile
 from toolkit.validate import TicketRecord
 
@@ -65,5 +66,12 @@ class ExtractionCache:
             self.entries = {k: v for k, v in self.entries.items() if k in keep}
         self.path.parent.mkdir(parents=True, exist_ok=True)
         tmp = self.path.with_name(f".{self.path.name}.tmp")
-        tmp.write_text(json.dumps({"format": CACHE_FORMAT, "entries": self.entries}, indent=2), encoding="utf-8")
-        os.replace(tmp, self.path)
+        try:
+            tmp.write_text(json.dumps({"format": CACHE_FORMAT, "entries": self.entries}, indent=2), encoding="utf-8")
+            os.replace(tmp, self.path)
+        except OSError as exc:
+            tmp.unlink(missing_ok=True)
+            raise ToolkitError(
+                f"Could not save {self.path.name} in {self.path.parent} ({exc.strerror or exc}). "
+                f"Check the folder isn't read-only or open in another program, then run again."
+            ) from exc

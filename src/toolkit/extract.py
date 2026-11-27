@@ -19,7 +19,7 @@ from toolkit.loaders import TicketFile
 from toolkit.validate import TicketRecord, unreadable, validate_extraction
 
 # Bump when the prompt or schema changes, so cached answers are re-read.
-PROMPT_VERSION = "1"
+PROMPT_VERSION = "2"
 
 # Kept under the API's limits: 5 MB per image, 32 MB per request (PDFs are sent base64, ~4/3 larger).
 MAX_BYTES = {"image": 5 * 1024 * 1024, "pdf": 24 * 1024 * 1024, "text": 1024 * 1024}
@@ -38,9 +38,11 @@ Fields:
 - account_id: the account number, digits only (labels such as "Acct", "acct #", "A/C"). \
 If any digit is unreadable, use null.
 - date: the service date as YYYY-MM-DD. Tickets usually leave out the year and mix formats \
-(for example 13/11, 11-16-26, Oct 08, 21 Oct). You are told the run month. Pick the reading that \
-falls in the run month and use the run month's year. If two different readings both fall in the \
-run month, or no reading does, use null.
+(for example 13/11, 11-16-26, Oct 08, 21 Oct). You are told the run month. A numeric date can be \
+read day-first or month-first; work out both readings, keep the one that falls in the run month, \
+and use the run month's year. Example: in run month 2026-10, "02/10" reads as 2 October or \
+10 February; only 2 October is in the run month, so the date is 2026-10-02. Use null only if both \
+readings fall in the run month and give different dates, or neither does, or the date is unreadable.
 - date_raw: the date exactly as written, or null if there is none.
 - site_address: the service address as written (labels such as "addr", "Site", "loc"), \
 including extra words such as "loading dock".

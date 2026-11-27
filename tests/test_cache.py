@@ -3,7 +3,11 @@
 import json
 from pathlib import Path
 
+import pytest
+
+from toolkit import cache as cache_module
 from toolkit.cache import ExtractionCache
+from toolkit.errors import ToolkitError
 from toolkit.loaders import TicketFile
 from toolkit.validate import TicketRecord
 
@@ -59,3 +63,13 @@ def test_unreadable_cache_is_moved_aside_with_warning(tmp_path):
     cache = ExtractionCache(path, SETTINGS)
     assert cache.entries == {} and "could not be read" in cache.warning
     assert (tmp_path / "extracted.json.unreadable").exists() and not path.exists()
+
+
+def test_save_failure_gives_plain_message_and_no_temp_file(tmp_path, monkeypatch):
+    def locked(*_):
+        raise PermissionError(13, "Permission denied")
+
+    monkeypatch.setattr(cache_module.os, "replace", locked)
+    with pytest.raises(ToolkitError, match="Could not save extracted.json"):
+        ExtractionCache(tmp_path / "extracted.json", SETTINGS).save()
+    assert not list(tmp_path.glob(".*.tmp"))
