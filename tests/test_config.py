@@ -116,13 +116,6 @@ def test_check_inputs_exist_names_what_is_missing(tmp_path):
 
 # --- API key ---
 
-@pytest.fixture
-def no_key(monkeypatch):
-    """Start with the key unset and remove anything load_dotenv adds once the test ends."""
-    monkeypatch.setenv(KEY_NAME, "placeholder")  # recorded, so teardown restores the original
-    monkeypatch.delenv(KEY_NAME)
-
-
 def test_key_read_from_env_file(tmp_path, monkeypatch, no_key):
     env = tmp_path / ".env"
     env.write_text(f"{KEY_NAME}=test-key-123\n")
