@@ -100,7 +100,8 @@ One build step per Claude Code session (see Build order). Each session:
 4. **Test before moving on:** run `pytest` and a real run on `2026-10` and
    `2026-11`. Show me the counts, not just "tests passed".
 5. **End of session:** draft the delivery-log entry (what you did, what you got
-   wrong and how it was caught, what I decided). I confirm the wording.
+   wrong and how it was caught, what I decided). I confirm the wording. Update the
+   Status section of `README.md` to match where the project stands.
 
 ## Git and commits
 
