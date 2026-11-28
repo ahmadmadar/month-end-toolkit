@@ -1,0 +1,11 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(.venv/bin/python run.py --month *)",
+      "Bash(.venv/bin/python scripts/show_summary.py --month *)"
+    ],
+    "ask": [
+      "Bash(.venv/bin/python run.py *--force*)"
+    ]
+  }
+}
