@@ -38,6 +38,7 @@ class Rules:
     review: dict[str, Any]
     low_confidence_to_review: bool
     hold_fee_words: tuple[str, ...]     # lowercase; found in a ticket's extras wording = fee held for review
+    approval_threshold: float | None    # invoices above this need manager sign-off; None if not set
     model_name: str
     model_effort: str
     model_max_tokens: int
@@ -134,6 +135,9 @@ def load_rules(path: Path) -> Rules:
     low_to_review = review.get("send_low_confidence_to_review", True)
     if not isinstance(low_to_review, bool):
         raise ToolkitError(f"{path.name}: 'review.send_low_confidence_to_review' must be true or false.")
+    threshold = review.get("approval_threshold_cad")
+    if threshold is not None and (isinstance(threshold, bool) or not isinstance(threshold, (int, float)) or threshold < 0):
+        raise ToolkitError(f"{path.name}: 'review.approval_threshold_cad' must be a number of 0 or more.")
     effort = model.get("effort")
     if effort not in EFFORT_LEVELS:
         raise ToolkitError(f"{path.name}: 'model.effort' must be one of {', '.join(EFFORT_LEVELS)}.")
@@ -157,6 +161,7 @@ def load_rules(path: Path) -> Rules:
         ),
         review=dict(review),
         low_confidence_to_review=low_to_review,
+        approval_threshold=None if threshold is None else float(threshold),
         hold_fee_words=_words(review.get("hold_fee_when_extras_note_contains"), "review.hold_fee_when_extras_note_contains", path),
         model_name=_text(model, "name", "model", path),
         model_effort=effort,

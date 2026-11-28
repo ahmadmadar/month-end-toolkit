@@ -16,7 +16,7 @@ from toolkit.cache import ExtractionCache
 from toolkit.checks import FLAGS, CheckResult, run_checks
 from toolkit.config import load_rules
 from toolkit.errors import ToolkitError
-from toolkit.excel import write_workbook
+from toolkit.excel import WorkbookData, needs_review_issues, write_workbook
 from toolkit.extract import Extractor
 from toolkit.loaders import TicketFile, count_by, discover_tickets, load_dispatch
 from toolkit.match import DUPLICATE, MATCHED, UNMATCHED, UNREADABLE, match_tickets, pickups_from
@@ -179,10 +179,21 @@ def run(
     log.info("checks", "match rate", rate,
              f"{checks.completed_matched} of {checks.completed} completed pickups have a ticket")
     log.info("checks", "clean pickups", len(checks.matched_clean), "matched with no flag")
+    log.info("checks", "rows on Needs review", len(needs_review_issues(checks)), "fees added with confidence are on Fees to add")
 
     log.info("output", paths.workbook.name, "written", f"{len(log.warnings)} warning(s) in this log")
     log.info("output", "run finished", datetime.now().strftime("%Y-%m-%d %H:%M:%S"))
-    write_workbook(paths.workbook, log)
+    write_workbook(paths.workbook, log, WorkbookData(
+        month=month,
+        client=rules.client,
+        rules_version=rules.version,
+        model=rules.model_name,
+        run_at=log.started_at,
+        dispatch_rows=rows,
+        tickets=len(found.tickets),
+        checks=checks,
+        approval_threshold=rules.approval_threshold,
+    ))
 
     return RunResult(
         workbook=paths.workbook,

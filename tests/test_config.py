@@ -61,6 +61,7 @@ def test_rules_values_and_extension_normalising(tmp_path):
 def test_repo_rules_review_words():
     rules = load_rules(ROOT / "rules" / "rules.yaml")
     assert rules.hold_fee_words == ("bag",) and rules.contamination_recorded_words == ("contam",)
+    assert rules.approval_threshold == 5000.0
 
 
 def test_missing_rules_file(tmp_path):
@@ -84,6 +85,7 @@ def test_missing_rules_file(tmp_path):
         ("Street: ST", "Street: 5", "address_words"),
         ("review: {}", "review:\n  send_low_confidence_to_review: maybe", "send_low_confidence_to_review"),
         ("review: {}", "review:\n  hold_fee_when_extras_note_contains: bag", "hold_fee_when_extras_note_contains"),
+        ("review: {}", "review:\n  approval_threshold_cad: lots", "approval_threshold_cad"),
     ],
 )
 def test_invalid_rules(tmp_path, old, new, message):

@@ -55,6 +55,8 @@ class Issue:
     site_address: str | None = None
     source_file: str | None = None
     fee_type: str | None = None
+    quantity: int | None = None       # bins for an extra-bin fee, 1 for contamination
+    unit_price: Decimal | None = None
     amount: Decimal | None = None
     fee_status: str | None = None     # ADD | HELD | None
 
@@ -63,6 +65,7 @@ class Issue:
 class CheckResult:
     issues: list[Issue]
     matched_clean: list[str]          # pickup_ids with a matched ticket and no issue
+    ticket_for_pickup: dict[str, str]  # pickup_id -> source_file of the ticket used
     completed: int
     completed_matched: int
     fees_added: Decimal = Decimal("0.00")
@@ -195,14 +198,16 @@ def run_checks(
                       f"{'an unclear amount' if recorded is None else recorded}. "
                       f"{unbilled} × ${bin_fee} = ${amount}.")
             issue(UNBILLED_EXTRA, _with_holds(reason, extra_holds), rec, p,
-                  fee_type=FEE_EXTRA_BIN, amount=amount, fee_status=HELD if extra_holds else ADD)
+                  fee_type=FEE_EXTRA_BIN, quantity=unbilled, unit_price=bin_fee, amount=amount,
+                  fee_status=HELD if extra_holds else ADD)
 
         # Contamination
         if rec.contamination and not _has_word(p.extras_recorded, rules.contamination_recorded_words):
             what = f": '{rec.contamination_note}'" if rec.contamination_note else ""
             reason = f"Ticket notes contamination{what}. Dispatch has no contamination charge. Flat fee ${contamination_fee}."
             issue(UNBILLED_CONTAMINATION, _with_holds(reason, holds), rec, p,
-                  fee_type=FEE_CONTAMINATION, amount=contamination_fee, fee_status=HELD if holds else ADD)
+                  fee_type=FEE_CONTAMINATION, quantity=1, unit_price=contamination_fee, amount=contamination_fee,
+                  fee_status=HELD if holds else ADD)
 
     for p in pickups:
         if _completed(p) and p.pickup_id not in matched.ticket_for_pickup:
@@ -218,6 +223,7 @@ def run_checks(
     return CheckResult(
         issues=issues,
         matched_clean=[pid for pid in matched.ticket_for_pickup if pid not in with_issue],
+        ticket_for_pickup=dict(matched.ticket_for_pickup),
         completed=len(completed),
         completed_matched=sum(p.pickup_id in matched.ticket_for_pickup for p in completed),
         fees_added=sum((i.amount for i in issues if i.fee_status == ADD), Decimal("0.00")),

@@ -47,7 +47,7 @@ def project(tmp_path, no_key) -> Path:
 
 def run_log_rows(path: Path) -> list[tuple]:
     wb = load_workbook(path)
-    assert wb.sheetnames == ["Run log"]
+    assert wb.sheetnames == ["Summary", "Fees to add", "Needs review", "Matched", "Run log"]
     return list(wb["Run log"].iter_rows(values_only=True))
 
 
