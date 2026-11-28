@@ -54,6 +54,13 @@ def test_rules_values_and_extension_normalising(tmp_path):
     assert rules.fees == {"extra_bin": 40.0}
     assert rules.address_match == "normalized"          # default when not set
     assert rules.address_words == {"street": "st"}      # lowercased
+    assert rules.low_confidence_to_review is True        # default when not set
+    assert rules.hold_fee_words == () and rules.contamination_recorded_words == ()
+
+
+def test_repo_rules_review_words():
+    rules = load_rules(ROOT / "rules" / "rules.yaml")
+    assert rules.hold_fee_words == ("bag",) and rules.contamination_recorded_words == ("contam",)
 
 
 def test_missing_rules_file(tmp_path):
@@ -75,6 +82,8 @@ def test_missing_rules_file(tmp_path):
         ("date_tolerance_days: 1\n", "date_tolerance_days: 1\n  address_match: fuzzy\n", "address_match"),
         ("Street: ST", "two words: x", "address_words"),
         ("Street: ST", "Street: 5", "address_words"),
+        ("review: {}", "review:\n  send_low_confidence_to_review: maybe", "send_low_confidence_to_review"),
+        ("review: {}", "review:\n  hold_fee_when_extras_note_contains: bag", "hold_fee_when_extras_note_contains"),
     ],
 )
 def test_invalid_rules(tmp_path, old, new, message):

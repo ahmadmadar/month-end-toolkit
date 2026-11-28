@@ -34,7 +34,10 @@ class Rules:
     date_tolerance_days: int
     address_match: str                  # "normalized" | "exact"
     address_words: dict[str, str]       # lowercase word -> lowercase replacement
+    contamination_recorded_words: tuple[str, ...]   # lowercase; found in extras_recorded = already billed
     review: dict[str, Any]
+    low_confidence_to_review: bool
+    hold_fee_words: tuple[str, ...]     # lowercase; found in a ticket's extras wording = fee held for review
     model_name: str
     model_effort: str
     model_max_tokens: int
@@ -90,6 +93,14 @@ def _address_words(raw: Any, path: Path) -> dict[str, str]:
     return words
 
 
+def _words(raw: Any, where: str, path: Path) -> tuple[str, ...]:
+    if raw is None:
+        return ()
+    if not isinstance(raw, list) or not all(isinstance(w, str) and w.strip() for w in raw):
+        raise ToolkitError(f"{path.name}: '{where}' must be a list of words, e.g. [bag].")
+    return tuple(dict.fromkeys(w.strip().lower() for w in raw))
+
+
 def load_rules(path: Path) -> Rules:
     """Read rules.yaml and return a validated Rules object. Raise ToolkitError on any problem."""
     if not path.is_file():
@@ -119,6 +130,10 @@ def load_rules(path: Path) -> Rules:
     address_match = matching.get("address_match", "normalized")
     if address_match not in ADDRESS_MATCH_MODES:
         raise ToolkitError(f"{path.name}: 'matching.address_match' must be one of {', '.join(ADDRESS_MATCH_MODES)}.")
+    review = _section(data, "review", path)
+    low_to_review = review.get("send_low_confidence_to_review", True)
+    if not isinstance(low_to_review, bool):
+        raise ToolkitError(f"{path.name}: 'review.send_low_confidence_to_review' must be true or false.")
     effort = model.get("effort")
     if effort not in EFFORT_LEVELS:
         raise ToolkitError(f"{path.name}: 'model.effort' must be one of {', '.join(EFFORT_LEVELS)}.")
@@ -137,7 +152,12 @@ def load_rules(path: Path) -> Rules:
         date_tolerance_days=tolerance,
         address_match=address_match,
         address_words=_address_words(matching.get("address_words"), path),
-        review=dict(_section(data, "review", path)),
+        contamination_recorded_words=_words(
+            matching.get("contamination_recorded_words"), "matching.contamination_recorded_words", path
+        ),
+        review=dict(review),
+        low_confidence_to_review=low_to_review,
+        hold_fee_words=_words(review.get("hold_fee_when_extras_note_contains"), "review.hold_fee_when_extras_note_contains", path),
         model_name=_text(model, "name", "model", path),
         model_effort=effort,
         model_max_tokens=max_tokens,

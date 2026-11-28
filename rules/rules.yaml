@@ -22,9 +22,11 @@ matching:
     crescent: cres
     drive: dr
     lane: ln
+  contamination_recorded_words: [contam]   # if dispatch extras_recorded contains one of these, contamination is already billed
 
 review:
   send_low_confidence_to_review: true
+  hold_fee_when_extras_note_contains: [bag]   # extras wording that can't safely be billed as bins: fee goes to Needs review, not Fees to add
   approval_threshold_cad: 5000   # invoices above this need manager sign-off
 
 model:
