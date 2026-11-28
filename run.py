@@ -13,6 +13,7 @@ ROOT = Path(__file__).resolve().parent
 sys.path.insert(0, str(ROOT / "src"))
 
 from toolkit.errors import ToolkitError  # noqa: E402
+from toolkit.excel import needs_review_issues  # noqa: E402
 from toolkit.pipeline import run  # noqa: E402
 
 
@@ -46,6 +47,7 @@ def main(argv: list[str] | None = None) -> int:
     flagged = sum(c.flag_counts.values())
     print(f"Checks: {flagged} flag(s), ${c.fees_added:.2f} in fees to add, ${c.fees_held:.2f} held for review, "
           f"match rate {'n/a' if c.match_rate is None else f'{c.match_rate}%'}.")
+    print(f"Needs review: {len(needs_review_issues(c))} row(s) to decide before invoices go out.")
     print(f"Wrote {result.workbook.relative_to(ROOT)}")
     if warnings:
         print("See the Run log tab for the warnings.")

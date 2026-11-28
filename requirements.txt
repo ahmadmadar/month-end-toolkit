@@ -1,6 +1,7 @@
-anthropic
-pandas
-openpyxl
-pyyaml
-python-dotenv
-pytest
+# Pinned to the versions the toolkit was built and tested with (session 4).
+anthropic==2.14.0
+openpyxl==3.1.5
+pandas==3.1.1
+python-dotenv==1.2.4
+PyYAML==6.0.4
+pytest==9.2.0
