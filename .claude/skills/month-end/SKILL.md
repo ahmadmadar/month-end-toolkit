@@ -36,7 +36,7 @@ or round a fee yourself.
    ```
    (Use `python` if there's no `.venv` folder.) The first run of a month reads
    each ticket with Claude, which takes a minute or two and costs about
-   $0.25 for 65 tickets. Runs after that reuse what was read and cost nothing.
+   25 cents for every 65 tickets. Runs after that reuse what was read and cost nothing.
    If the output starts with `Stopped:`, go to "If it stops" below.
 
 5. **Get the results.**
