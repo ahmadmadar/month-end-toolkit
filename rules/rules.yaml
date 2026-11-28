@@ -13,7 +13,15 @@ fees:
 
 matching:
   date_tolerance_days: 1    # ticket date may be off by this much
-  address_match: normalized # compare lowercase, no punctuation, St/Street etc.
+  address_match: normalized # normalized: ignore case, punctuation and the word swaps below | exact: ignore case and spacing only
+  address_words:            # whole words treated as the same before comparing; every other word must match
+    street: st
+    avenue: ave
+    road: rd
+    boulevard: blvd
+    crescent: cres
+    drive: dr
+    lane: ln
 
 review:
   send_low_confidence_to_review: true

@@ -13,6 +13,7 @@ import yaml
 from toolkit.errors import ToolkitError
 
 EFFORT_LEVELS = ("low", "medium", "high", "xhigh", "max")
+ADDRESS_MATCH_MODES = ("normalized", "exact")
 
 
 @dataclass(frozen=True)
@@ -31,6 +32,8 @@ class Rules:
     fees: dict[str, float]
     matching: dict[str, Any]
     date_tolerance_days: int
+    address_match: str                  # "normalized" | "exact"
+    address_words: dict[str, str]       # lowercase word -> lowercase replacement
     review: dict[str, Any]
     model_name: str
     model_effort: str
@@ -71,6 +74,22 @@ def _fees(raw: dict, path: Path) -> dict[str, float]:
     return fees
 
 
+def _address_words(raw: Any, path: Path) -> dict[str, str]:
+    if raw is None:
+        return {}
+    if not isinstance(raw, dict):
+        raise ToolkitError(f"{path.name}: 'matching.address_words' must be a list of word: replacement pairs.")
+    words = {}
+    for word, replacement in raw.items():
+        if not isinstance(word, str) or not isinstance(replacement, str) or " " in word.strip() \
+                or not word.strip() or not replacement.strip():
+            raise ToolkitError(
+                f"{path.name}: 'matching.address_words' entry {word!r}: {replacement!r} must be one word mapped to text."
+            )
+        words[word.strip().lower()] = replacement.strip().lower()
+    return words
+
+
 def load_rules(path: Path) -> Rules:
     """Read rules.yaml and return a validated Rules object. Raise ToolkitError on any problem."""
     if not path.is_file():
@@ -97,6 +116,9 @@ def load_rules(path: Path) -> Rules:
     tolerance = matching.get("date_tolerance_days")
     if isinstance(tolerance, bool) or not isinstance(tolerance, int) or tolerance < 0:
         raise ToolkitError(f"{path.name}: 'matching.date_tolerance_days' must be a whole number of 0 or more.")
+    address_match = matching.get("address_match", "normalized")
+    if address_match not in ADDRESS_MATCH_MODES:
+        raise ToolkitError(f"{path.name}: 'matching.address_match' must be one of {', '.join(ADDRESS_MATCH_MODES)}.")
     effort = model.get("effort")
     if effort not in EFFORT_LEVELS:
         raise ToolkitError(f"{path.name}: 'model.effort' must be one of {', '.join(EFFORT_LEVELS)}.")
@@ -113,6 +135,8 @@ def load_rules(path: Path) -> Rules:
         fees=_fees(_section(data, "fees", path), path),
         matching=dict(matching),
         date_tolerance_days=tolerance,
+        address_match=address_match,
+        address_words=_address_words(matching.get("address_words"), path),
         review=dict(_section(data, "review", path)),
         model_name=_text(model, "name", "model", path),
         model_effort=effort,

@@ -23,6 +23,8 @@ fees:
   extra_bin: 40
 matching:
   date_tolerance_days: 1
+  address_words:
+    Street: ST
 review: {}
 model:
   name: some-model
@@ -50,6 +52,8 @@ def test_rules_values_and_extension_normalising(tmp_path):
     assert rules.version == "1"
     assert rules.inputs.ticket_extensions == (".txt", ".pdf")
     assert rules.fees == {"extra_bin": 40.0}
+    assert rules.address_match == "normalized"          # default when not set
+    assert rules.address_words == {"street": "st"}      # lowercased
 
 
 def test_missing_rules_file(tmp_path):
@@ -68,6 +72,9 @@ def test_missing_rules_file(tmp_path):
         ("client: Test Client\n", "", "client"),
         ("effort: low", "effort: extreme", "model.effort"),
         ("date_tolerance_days: 1", "date_tolerance_days: -1", "date_tolerance_days"),
+        ("date_tolerance_days: 1\n", "date_tolerance_days: 1\n  address_match: fuzzy\n", "address_match"),
+        ("Street: ST", "two words: x", "address_words"),
+        ("Street: ST", "Street: 5", "address_words"),
     ],
 )
 def test_invalid_rules(tmp_path, old, new, message):
