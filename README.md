@@ -56,7 +56,7 @@ end from saved ticket answers and fails if Claude is called;
 | 1. Load + run command | Done (2026-11-27) |
 | 2. Ticket extraction (Claude) | Done (2026-11-27) |
 | 3. Matching + checks | Done (2026-11-27) |
-| 4. Full Excel output + month-two test | In progress: tabs and month-two test done; Skill and handover next |
+| 4. Full Excel output + month-two test | Done (2026-11-27) |
 
 **What works today:** `python run.py --month YYYY-MM` checks the API key, reads
 `rules/rules.yaml`, loads the dispatch export, finds the ticket files, reads each
@@ -71,8 +71,17 @@ them and makes no API calls unless a ticket file or the model settings in
 `rules.yaml` change. Changing `model:` settings re-reads every ticket (about
 $0.25 per sample month).
 
-**Not yet:** the Claude Skill wrapper (`.claude/skills/month-end/`) is still a
-stub, and the handover document isn't written.
+The **month-end Claude Skill** (`.claude/skills/month-end/`) runs the tool when
+someone asks ("run month-end for November") and explains the results in plain
+English, using only the tool's numbers. It never overwrites a month's Excel file
+without asking.
+
+**Handover:** `docs/handover.md` covers running it, what to check before
+invoicing, the rules you can change, data and access, and known limits.
+
+**Not yet:** PDF and image tickets are supported but haven't been run on real
+scans (the samples are text). Needs review decisions aren't carried into the
+next month.
 
 See `CLAUDE.md` for the spec and build order, and `docs/delivery-log.md` for what
 was built and what broke.
