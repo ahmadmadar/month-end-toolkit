@@ -64,6 +64,11 @@ def test_run_writes_run_log_tab(project):
     assert flat[("start", "API key")] == "present"
     assert flat[("extract", "sent to Claude")] == "2"
     assert flat[("extract", "high confidence")] == "2"
+    # t1/t2 both get the same fake answer (acct 1264), and the pickups are acct 1043: nothing matches
+    assert flat[("match", "tickets unmatched")] == "2" and flat[("match", "tickets duplicate")] == "0"
+    assert flat[("checks", "missing_ticket")] == "2"
+    assert flat[("checks", "fees to add ($)")] == "0.00"
+    assert flat[("checks", "match rate")] == "0.0%"
     assert not list(result.workbook.parent.glob(".*.tmp"))
 
 

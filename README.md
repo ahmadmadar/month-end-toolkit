@@ -38,22 +38,25 @@ pytest
 |---|---|
 | 1. Load + run command | Done (2026-11-27) |
 | 2. Ticket extraction (Claude) | Done (2026-11-27) |
-| 3. Matching + checks | Next |
-| 4. Full Excel output + month-two test | Not started |
+| 3. Matching + checks | Done (2026-11-27) |
+| 4. Full Excel output + month-two test | Next |
 
 **What works today:** `python run.py --month YYYY-MM` checks the API key, reads
 `rules/rules.yaml`, loads the dispatch export, finds the ticket files, reads each
-ticket with Claude into fixed fields, checks every field, and writes the Excel
-file with a **Run log** tab (counts, file names, warnings, model, tokens). Both
-sample months (`2026-10`, `2026-11`) run with no code changes.
+ticket with Claude into fixed fields, checks every field, matches tickets to
+pickups, runs all eight checks with fees from `rules.yaml`, and writes the Excel
+file with a **Run log** tab (counts, flag counts, fees, match rate, model,
+tokens). Uncertain fees are held for review, never added. Both sample months
+(`2026-10`, `2026-11`) run with no code changes and find every planted issue in
+the answer keys.
 
 Ticket answers are saved in `outputs/YYYY-MM/extracted.json`. A re-run reuses
 them and makes no API calls unless a ticket file or the model settings in
 `rules.yaml` change. Changing `model:` settings re-reads every ticket (about
 $0.25 per sample month).
 
-**Not yet:** no matching, checks, fees or review rows; the Excel file has only
-the Run log tab.
+**Not yet:** the Excel file has only the Run log tab. The Summary, Fees to add,
+Needs review and Matched tabs, and the Claude Skill wrapper, come in step 4.
 
 See `CLAUDE.md` for the spec and build order, and `docs/delivery-log.md` for what
 was built and what broke.

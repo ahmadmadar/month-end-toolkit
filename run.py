@@ -42,6 +42,10 @@ def main(argv: list[str] | None = None) -> int:
     low = sum(r.confidence == "low" for r in result.records)
     print(f"Month {args.month}: {result.dispatch_rows} pickups, {result.tickets} ticket files, {warnings} warning(s).")
     print(f"Tickets: {s.from_cache} from saved results, {s.sent} sent to Claude, {s.failed} failed, {low} low confidence.")
+    c = result.checks
+    flagged = sum(c.flag_counts.values())
+    print(f"Checks: {flagged} flag(s), ${c.fees_added:.2f} in fees to add, ${c.fees_held:.2f} held for review, "
+          f"match rate {'n/a' if c.match_rate is None else f'{c.match_rate}%'}.")
     print(f"Wrote {result.workbook.relative_to(ROOT)}")
     if warnings:
         print("See the Run log tab for the warnings.")
