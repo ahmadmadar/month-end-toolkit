@@ -121,6 +121,9 @@ makes these changes.
 - Claude (via the month-end Skill) can run the tool and read the Summary. It's
   told never to change the rules, the code or any file, and never to overwrite
   a month's Excel file without asking.
+- The project's `.claude/settings.json` lets Claude run only two commands
+  without asking: running a month and showing its results. Replacing an
+  existing month's Excel file (`--force`) always asks, and so does anything else.
 
 ## 30-day check
 
