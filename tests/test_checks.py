@@ -1,8 +1,11 @@
-"""The checks and fee math on small made-up cases. No API calls.
+"""The checks and fee math. No API calls.
 
-(Comparison with tests/fixtures/YYYY-MM/expected_issues.json is added with the pipeline wiring.)
+Small made-up cases first, then each sample month compared with its answer key
+(tests/fixtures/YYYY-MM/expected_issues.json), using the ticket answers saved
+from the real runs (tests/fixtures/YYYY-MM/extracted_records.json).
 """
 
+import json
 from dataclasses import replace
 from datetime import date
 from decimal import Decimal
@@ -17,7 +20,9 @@ from toolkit.checks import (
 )
 from toolkit.config import load_rules
 from toolkit.errors import ToolkitError
-from toolkit.match import Pickup, match_tickets
+from toolkit.loaders import load_dispatch
+from toolkit.match import Pickup, match_tickets, pickups_from
+from toolkit.paths import month_paths
 from toolkit.validate import TicketRecord
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -167,3 +172,45 @@ def test_missing_fee_setting_stops_the_run(rules):
                                      ("extra bin x2", None), ("see note", None)])
 def test_recorded_extra_bins(text, n):
     assert recorded_extra_bins(text) == n
+
+
+# --- sample months vs. answer key ---
+
+@pytest.mark.parametrize("month", ["2026-10", "2026-11"])
+def test_sample_month_matches_answer_key(rules, month):
+    paths = month_paths(month, rules, ROOT)
+    if not paths.dispatch_file.exists():
+        pytest.skip(f"inputs/{month} not generated; run scripts/make_sample_data.py")
+    fixtures = ROOT / "tests" / "fixtures" / month
+    key = json.loads((fixtures / "expected_issues.json").read_text())
+    records = [TicketRecord.from_dict(r) for r in json.loads((fixtures / "extracted_records.json").read_text())]
+    pickups = pickups_from(load_dispatch(paths.dispatch_file, paths.first_day, paths.last_day).rows)
+    result = check(rules, pickups, records)
+
+    def ident(flag, pickup_id, account_id, day):
+        return flag, pickup_id or ("ticket", account_id, day)
+
+    expected = {ident(e["flag"], e["pickup_id"], e["account_id"], e["date"]) for e in key}
+    found = [ident(i.flag, i.pickup_id, i.account_id, i.date) for i in result.issues]
+
+    # Decision 3: a ticket too damaged to read isn't guessed onto a pickup. It's flagged on its own,
+    # and the pickup it belongs to shows as missing a ticket (with a note saying so).
+    unreadable = [i for i in result.issues if i.flag == NEEDS_HUMAN_READ and i.pickup_id is None and not i.account_id]
+    for e in [e for e in key if e["flag"] == NEEDS_HUMAN_READ and e["pickup_id"]][: len(unreadable)]:
+        expected.remove(ident(NEEDS_HUMAN_READ, e["pickup_id"], e["account_id"], e["date"]))
+        expected |= {ident(NEEDS_HUMAN_READ, None, None, None), ident(MISSING_TICKET, e["pickup_id"], None, None)}
+
+    assert len(found) == len(set(found)), "a flag was raised twice for the same pickup or ticket"
+    assert set(found) == expected   # every planted issue found, and nothing else flagged
+
+    by_pickup = {(i.flag, i.pickup_id): i for i in result.issues}
+    for e in key:
+        if e["flag"] == UNBILLED_EXTRA:
+            assert by_pickup[(UNBILLED_EXTRA, e["pickup_id"])].amount == Decimal("40.00") * e["extra_bins"]
+        if e["flag"] == UNBILLED_CONTAMINATION:
+            i = by_pickup[(UNBILLED_CONTAMINATION, e["pickup_id"])]
+            assert i.amount == Decimal("175.00") and e["note"] in i.reason
+        if e["flag"] == ADDRESS_MISMATCH:
+            assert e["ticket_address"] in by_pickup[(ADDRESS_MISMATCH, e["pickup_id"])].reason
+    # zero fees that aren't on a ticket
+    assert all(i.source_file for i in result.issues if i.amount is not None)

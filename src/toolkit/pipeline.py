@@ -1,8 +1,7 @@
 """One month's run, start to finish.
 
 Key check, rules, paths, dispatch load, ticket discovery, ticket reading
-(Claude, cached in extracted.json), Run log tab. Checks (session 3) slot in
-between ticket reading and writing.
+(Claude, cached in extracted.json), matching, checks, then the workbook.
 """
 
 from collections.abc import Callable
@@ -14,11 +13,13 @@ import anthropic
 
 from toolkit.apikey import load_api_key
 from toolkit.cache import ExtractionCache
+from toolkit.checks import FLAGS, CheckResult, run_checks
 from toolkit.config import load_rules
 from toolkit.errors import ToolkitError
 from toolkit.excel import write_workbook
 from toolkit.extract import Extractor
 from toolkit.loaders import TicketFile, count_by, discover_tickets, load_dispatch
+from toolkit.match import DUPLICATE, MATCHED, UNMATCHED, UNREADABLE, match_tickets, pickups_from
 from toolkit.paths import check_inputs_exist, month_paths
 from toolkit.runlog import RunLog
 from toolkit.validate import TicketRecord
@@ -48,6 +49,7 @@ class RunResult:
     runlog: RunLog
     records: list[TicketRecord] = field(default_factory=list)
     stats: ReadStats = field(default_factory=ReadStats)
+    checks: CheckResult | None = None
 
 
 def read_tickets(
@@ -160,6 +162,24 @@ def run(
     log.info("extract", "high confidence", sum(r.confidence == "high" for r in records))
     log.info("extract", "tokens in / out", f"{stats.input_tokens} / {stats.output_tokens}", "this run only")
 
+    pickups = pickups_from(rows)
+    matched = match_tickets(records, pickups, rules)
+    statuses = count_by(m.status for m in matched.matches)
+    for status, note in [(MATCHED, "paired with a pickup"), (DUPLICATE, "second ticket for a pickup"),
+                         (UNMATCHED, "no pickup for this account, site and date"),
+                         (UNREADABLE, "account or date unreadable")]:
+        log.info("match", f"tickets {status}", statuses.get(status, 0), note)
+
+    checks = run_checks(pickups, records, matched, rules)
+    for flag in FLAGS:
+        log.info("checks", flag, checks.flag_counts[flag])
+    log.info("checks", "fees to add ($)", f"{checks.fees_added:.2f}", f"{len(checks.fees('add'))} fee(s)")
+    log.info("checks", "fees held for review ($)", f"{checks.fees_held:.2f}", f"{len(checks.fees('held'))} fee(s)")
+    rate = "n/a" if checks.match_rate is None else f"{checks.match_rate}%"
+    log.info("checks", "match rate", rate,
+             f"{checks.completed_matched} of {checks.completed} completed pickups have a ticket")
+    log.info("checks", "clean pickups", len(checks.matched_clean), "matched with no flag")
+
     log.info("output", paths.workbook.name, "written", f"{len(log.warnings)} warning(s) in this log")
     log.info("output", "run finished", datetime.now().strftime("%Y-%m-%d %H:%M:%S"))
     write_workbook(paths.workbook, log)
@@ -171,4 +191,5 @@ def run(
         runlog=log,
         records=records,
         stats=stats,
+        checks=checks,
     )
