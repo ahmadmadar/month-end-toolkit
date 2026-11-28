@@ -85,3 +85,24 @@ def test_both_months_in_one_project(project):
     books = [run(m, project, client=NoCalls()).workbook for m in MONTHS]
     assert [b.name for b in books] == [f"reconciliation_{m}.xlsx" for m in MONTHS]
     assert all(b.exists() for b in books)
+
+
+def test_show_summary_reads_the_workbook_without_ticket_detail(project, monkeypatch, capsys):
+    """scripts/show_summary.py (used by the month-end Skill) prints the run's numbers, no addresses or reasons."""
+    import importlib.util
+
+    spec = importlib.util.spec_from_file_location("show_summary", ROOT / "scripts" / "show_summary.py")
+    show_summary = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(show_summary)
+    monkeypatch.setattr(show_summary, "ROOT", project)
+
+    assert show_summary.main(["--month", "2026-11"]) == 1           # no workbook yet
+    assert "No results for 2026-11 yet" in capsys.readouterr().err
+
+    result = run("2026-11", project, client=NoCalls())
+    assert show_summary.main(["--month", "2026-11"]) == 0
+    out = capsys.readouterr().out
+    assert f"Fees to add | ${result.checks.fees_added:,.2f}" in out
+    assert "Needs review rows by issue" in out
+    for detail in ["Lakeview", "Kingsway", "dispatch recorded", "ticket_P2026"]:
+        assert detail not in out
